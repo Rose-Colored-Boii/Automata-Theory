@@ -7,9 +7,9 @@
 
 
 class NFA {
-public:
-
 private:
+
+public:
 
 };
 

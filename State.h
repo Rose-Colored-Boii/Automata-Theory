@@ -7,6 +7,9 @@
 
 
 class State {
+private:
+
+public:
 
 };
 
