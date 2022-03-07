@@ -8,18 +8,28 @@
 
 bool NFA::accepts(const string &input) {
     currStates = {};
+    //Find start state of the NFA
     for (auto state : states){
         if (state->isStarting()) {
             currStates.insert(state);
             break;
         }
     }
+    //Traverse over input string
     for (auto character : input){
+        //If character not in alphabet, string is not accepted
+        if (find(alphabet.begin(), alphabet.end(), character) == alphabet.end()){
+            return false;
+        }
+        //Temporary set to hold next states that the NFA goes to
         set<State*> temp;
+        //Traverse over currStates and add correct states to temp set
         for (auto state : currStates){
+            //If transtion not in transitions, check next state in currState
             if (state->getTransitions().find(character) == state->getTransitions().end()){
                 continue;
             }
+            //If transition does exist, add all states in set of states to temp
             for (auto transition : state->getTransitions()){
                 if (transition.first == character){
                     for (auto toState : transition.second){
@@ -30,6 +40,7 @@ bool NFA::accepts(const string &input) {
         }
         currStates = temp;
     }
+    //At end of string, check if any state in currStates is a final state, if so, string is accepted
     for (auto state : currStates){
         if (state->isAccepting()){
             return true;

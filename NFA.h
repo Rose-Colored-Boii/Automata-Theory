@@ -14,13 +14,15 @@ class State;
 
 class NFA {
 private:
-
+    //Vector that holds all states
     vector<State*> states;
+    //Set that holds the alphabet
     set<char> alphabet;
+    //Set that contains all current states of the NFA
     set<State*> currStates;
 
 public:
-
+    //Destructor that deletes all states
     ~NFA();
 
     //Method that checks if string is accepted by the NFA

@@ -13,6 +13,7 @@ class State {
 private:
 
     string name;
+    //Map that maps input character to set of states
     map<char, set<State*>> transitions = {};
     bool accepting;
     bool starting;
@@ -27,6 +28,7 @@ public:
 
     void addTransition(char character, State* state);
 
+    //Getters
     const string &getName() const;
     const map<char, set<State *>> &getTransitions() const;
     bool isAccepting() const;

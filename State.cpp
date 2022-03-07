@@ -21,9 +21,11 @@ bool State::isStarting() const {
 }
 
 void State::addTransition(char character, State *state) {
+    //Check if transition already exists. If not, map character to singleton of that state
     if (transitions.find(character) == transitions.end()){
         transitions[character] = {state};
     }
+    //else, insert into set
     else{
         transitions[character].insert(state);
     }
