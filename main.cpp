@@ -1,6 +1,6 @@
 #include <iostream>
 #include "NFA.h"
-#include "State.h"
+#include "NFAState.h"
 
 int main() {
     return 0;

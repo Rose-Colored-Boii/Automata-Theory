@@ -4,7 +4,7 @@
 
 #include "NFA.h"
 #include "algorithm"
-#include "State.h"
+#include "NFAState.h"
 
 bool NFA::accepts(const string &input) {
     currStates = {};
@@ -22,7 +22,7 @@ bool NFA::accepts(const string &input) {
             return false;
         }
         //Temporary set to hold next states that the NFA goes to
-        set<State*> temp;
+        set<NFAState*> temp;
         //Traverse over currStates and add correct states to temp set
         for (auto state : currStates){
             //If transtion not in transitions, check next state in currState
@@ -49,7 +49,7 @@ bool NFA::accepts(const string &input) {
     return false;
 }
 
-bool NFA::addState(State *state) {
+bool NFA::addState(NFAState *state) {
     //If state already in states, return false
     if (find(states.begin(), states.end(), state) != states.end()){
         return false;

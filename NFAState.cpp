@@ -2,25 +2,25 @@
 // Created by Liam on 6/03/2022.
 //
 
-#include "State.h"
+#include "NFAState.h"
 
-const string &State::getName() const {
+const string &NFAState::getName() const {
     return name;
 }
 
-const map<char, set<State *>> &State::getTransitions() const {
+const map<char, set<NFAState *>> &NFAState::getTransitions() const {
     return transitions;
 }
 
-bool State::isAccepting() const {
+bool NFAState::isAccepting() const {
     return accepting;
 }
 
-bool State::isStarting() const {
+bool NFAState::isStarting() const {
     return starting;
 }
 
-void State::addTransition(char character, State *state) {
+void NFAState::addTransition(char character, NFAState *state) {
     //Check if transition already exists. If not, map character to singleton of that state
     if (transitions.find(character) == transitions.end()){
         transitions[character] = {state};

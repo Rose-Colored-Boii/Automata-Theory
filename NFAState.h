@@ -2,38 +2,38 @@
 // Created by Liam on 6/03/2022.
 //
 
-#ifndef NFA_STATE_H
-#define NFA_STATE_H
+#ifndef NFA_NFASTATE_H
+#define NFA_NFASTATE_H
 #include "map"
 #include "set"
 #include "iostream"
 using namespace std;
 
-class State {
+class NFAState {
 private:
 
     string name;
     //Map that maps input character to set of states
-    map<char, set<State*>> transitions = {};
+    map<char, set<NFAState*>> transitions = {};
     bool accepting;
     bool starting;
 
 public:
 
-    State(string name, bool accepting, bool starting){
+    NFAState(string name, bool accepting, bool starting){
         this->name = name;
         this->accepting = accepting;
         this->starting = starting;
     }
 
-    void addTransition(char character, State* state);
+    void addTransition(char character, NFAState* state);
 
     //Getters
     const string &getName() const;
-    const map<char, set<State *>> &getTransitions() const;
+    const map<char, set<NFAState *>> &getTransitions() const;
     bool isAccepting() const;
     bool isStarting() const;
 };
 
 
-#endif //NFA_STATE_H
+#endif //NFA_NFASTATE_H
