@@ -7,6 +7,7 @@
 #include "iostream"
 #include "vector"
 #include "set"
+#include "DFA.h"
 
 using namespace std;
 
@@ -31,6 +32,8 @@ public:
     bool addState(NFAState* state);
     //Set the alphabet of the NFA
     void setAlphabet(set<char> alphabet);
+    //Convert NFA to DFA via SSC
+    DFA* toDFA();
 };
 
 

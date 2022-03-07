@@ -62,7 +62,13 @@ void NFA::setAlphabet(set<char> alphabet) {
     this->alphabet = alphabet;
 }
 
+
+
 NFA::~NFA() {
     for (auto state : states)
         delete state;
+}
+
+DFA *NFA::toDFA() {
+    return nullptr;
 }
