@@ -23,6 +23,9 @@ private:
     set<NFAState*> currStates;
 
 public:
+
+    NFA(string filename);
+
     //Destructor that deletes all states
     ~NFA();
 
@@ -34,6 +37,8 @@ public:
     void setAlphabet(set<char> alphabet);
     //Convert NFA to DFA via SSC
     DFA* toDFA();
+
+    void print();
 };
 
 

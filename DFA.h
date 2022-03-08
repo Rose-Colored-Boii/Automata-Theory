@@ -31,6 +31,8 @@ public:
     void setAlphabet(set<char> alphabet);
     //Convert DFA to json
     void print();
+
+    DFA();
 };
 
 

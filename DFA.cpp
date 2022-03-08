@@ -128,3 +128,7 @@ DFA::~DFA() {
         delete state;
     }
 }
+
+DFA::DFA() {
+
+}
