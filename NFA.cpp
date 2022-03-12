@@ -75,17 +75,103 @@ NFA::~NFA() {
         delete state;
 }
 
-DFA *NFA::toDFA() {
-    DFA* dfa = new DFA();
+DFA NFA::toDFA() {
+    vector<DFAState*> tempStates;
+    DFA dfa;
+    dfa.setAlphabet(alphabet);
     for (auto state : states){
         if (state->isStarting()){
             string name = '{' + state->getName() + '}';
             auto* s = new DFAState(name, state->isAccepting(), true);
-            for (auto transition : state->getTransitions()){
-                continue;
+            dfa.addState(s);
+            tempStates.push_back(s);
+            break;
+        }
+    }
+    for (int i = 0; i != tempStates.size(); i++){
+        if (tempStates[i]->getName() == "{}"){
+            continue;
+        }
+        for (auto character : alphabet) {
+            bool accepting = false;
+            vector<string> nameList;
+            string name = tempStates[i]->getName();
+            string stateName;
+            vector<string> s;
+            int j = 1;
+            while (j != name.size()-1) {
+                if (name[j] == ',') {
+                    j++;
+                    s.push_back(stateName);
+                    stateName = "";
+                    continue;
+                }
+                stateName += name[j];
+                j++;
+                if (j == name.size()-1){
+                    s.push_back(stateName);
+                }
+            }
+            for (const auto &stateN: s) {
+                for (auto state: states) {
+                    if (stateN == state->getName()) {
+                        if (state->getTransitions().find(character) != state->getTransitions().end()) {
+                            for (auto toState: state->getTransitions().find(character)->second) {
+                                nameList.push_back(toState->getName());
+                                if (state->isAccepting()) {
+                                    accepting = true;
+                                }
+                            }
+                        }
+                        else{
+                            bool exists = false;
+                            string temp = "{}";
+                            for (auto check : tempStates) {
+                                if (check->getName() == temp){
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (!exists) {
+                                auto *dfaState = new DFAState(temp, false, false);
+                                for (auto input : alphabet){
+                                    dfaState->addTransition(input, dfaState);
+                                }
+                                tempStates.push_back(dfaState);
+                                dfa.addState(dfaState);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            sort(nameList.begin(), nameList.end());
+            string newStateName = "{";
+            for (auto n : nameList){
+                newStateName += n;
+                newStateName += ",";
+            }
+            if (newStateName == "{"){
+                newStateName += "}";
+            } else{
+                newStateName[newStateName.size()-1] = '}';
+            }
+            bool exists = false;
+            for (auto check : tempStates){
+                if (newStateName == check->getName()){
+                    tempStates[i]->addTransition(character, check);
+                    exists = true;
+                }
+            }
+            if (!exists) {
+                auto *newState = new DFAState(newStateName, accepting, false);
+                dfa.addState(newState);
+                tempStates.push_back(newState);
+                tempStates[i]->addTransition(character, newState);
             }
         }
     }
+    return dfa;
 }
 
 NFA::NFA(string filename) {

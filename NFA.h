@@ -36,7 +36,7 @@ public:
     //Set the alphabet of the NFA
     void setAlphabet(set<char> alphabet);
     //Convert NFA to DFA via SSC
-    DFA* toDFA();
+    DFA toDFA();
 
     void print();
 };

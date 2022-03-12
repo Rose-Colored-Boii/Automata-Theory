@@ -32,6 +32,8 @@ public:
     //Convert DFA to json
     void print();
 
+    const vector<DFAState *> &getStates() const;
+
     DFA();
 };
 

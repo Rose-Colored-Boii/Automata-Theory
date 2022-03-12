@@ -132,3 +132,7 @@ DFA::~DFA() {
 DFA::DFA() {
 
 }
+
+const vector<DFAState *> &DFA::getStates() const {
+    return states;
+}
