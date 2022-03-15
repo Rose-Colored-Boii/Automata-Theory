@@ -23,6 +23,7 @@ private:
     set<NFAState*> currStates;
 
 public:
+    NFA() = default;
 
     NFA(string filename);
 

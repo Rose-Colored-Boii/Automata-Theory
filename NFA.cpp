@@ -94,7 +94,7 @@ DFA NFA::toDFA() {
         }
         for (auto character : alphabet) {
             bool accepting = false;
-            vector<string> nameList;
+            set<string> nameList;
             string name = tempStates[i]->getName();
             string stateName;
             vector<string> s;
@@ -112,15 +112,15 @@ DFA NFA::toDFA() {
                     s.push_back(stateName);
                 }
             }
-            for (const auto &stateN: s) {
+            for (auto stateN: s) {
                 for (auto state: states) {
                     if (stateN == state->getName()) {
                         if (state->getTransitions().find(character) != state->getTransitions().end()) {
                             for (auto toState: state->getTransitions().find(character)->second) {
-                                nameList.push_back(toState->getName());
-                                if (state->isAccepting()) {
+                                if (toState->isAccepting()) {
                                     accepting = true;
                                 }
+                                nameList.insert(toState->getName());
                             }
                         }
                         else{
@@ -145,9 +145,13 @@ DFA NFA::toDFA() {
                     }
                 }
             }
-            sort(nameList.begin(), nameList.end());
+            vector<string> newNames;
+            for (auto newName : nameList){
+                newNames.push_back(newName);
+            }
+            sort(newNames.begin(), newNames.end());
             string newStateName = "{";
-            for (auto n : nameList){
+            for (auto n : newNames){
                 newStateName += n;
                 newStateName += ",";
             }
