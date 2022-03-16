@@ -136,3 +136,87 @@ DFA::DFA() {
 const vector<DFAState *> &DFA::getStates() const {
     return states;
 }
+
+DFA::DFA(const DFA& dfa1, const DFA& dfa2, bool intersection) {
+    this->alphabet = dfa1.alphabet;
+    for (auto state1 : dfa1.states){
+        for (auto state2 : dfa2.states){
+            if (state1->isBeginning() and state2->isBeginning()){
+                bool accepting = false;
+                if (intersection){
+                    if (state1->isAccepting() and state2->isAccepting()){
+                        accepting = true;
+                    }
+                }
+                else{
+                    if (state1->isAccepting() or state2->isAccepting()){
+                        accepting = true;
+                    }
+                }
+                string name = '(' + state1->getName() + ',' + state2->getName() + ')';
+                auto newState = new DFAState(name, accepting, true);
+                addState(newState);
+            }
+        }
+    }
+    for (int i = 0; i != states.size(); i++){
+        vector<string> newNames;
+        string temp;
+        DFAState* dfaState1 = nullptr;
+        DFAState* dfaState2 = nullptr;
+        for (int j = 1; j != states[i]->getName().size(); j++){
+            if (states[i]->getName()[j] == ','){
+                newNames.push_back(temp);
+                temp = "";
+                continue;
+            }
+            if (states[i]->getName()[j]  == ')'){
+                newNames.push_back(temp);
+                break;
+            }
+            temp += states[i]->getName()[j];
+        }
+        for (auto state1 : dfa1.getStates()){
+            if (state1->getName() == newNames[0]){
+                dfaState1 = state1;
+                break;
+            }
+        }
+        for (auto state2 : dfa2.getStates()){
+            if (state2->getName() == newNames[1]){
+                dfaState2 = state2;
+                break;
+            }
+        }
+        for (auto transition1 : dfaState1->getTransitions()){
+            for (auto transition2 : dfaState2->getTransitions()){
+                if (transition1.first == transition2.first){
+                    DFAState* s1 = nullptr;
+                    string newName = '(' + transition1.second->getName() + ',' + transition2.second->getName() + ')';
+                    for (auto toState : states){
+                        if (toState->getName() == newName){
+                            s1 = toState;
+                            break;
+                        }
+                    }
+                    if (s1 == nullptr){
+                        bool accepting = false;
+                        if (intersection){
+                            if (transition1.second->isAccepting() and transition2.second->isAccepting()){
+                                accepting = true;
+                            }
+                        }
+                        else{
+                            if (transition1.second->isAccepting() or transition2.second->isAccepting()){
+                                accepting = true;
+                            }
+                        }
+                        s1 = new DFAState(newName, accepting, false);
+                        addState(s1);
+                    }
+                    states[i]->addTransition(transition1.first, s1);
+                }
+            }
+        }
+    }
+}

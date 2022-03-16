@@ -6,4 +6,5 @@
 int main() {
     ENFA enfa("input-mssc1.json");
     enfa.toDFA().print();
+    return 0;
 }

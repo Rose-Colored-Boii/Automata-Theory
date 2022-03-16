@@ -32,8 +32,6 @@ public:
     void setAlphabet(set<char> alphabet);
     //Convert ENFA to DFA via SSC
     DFA toDFA();
-    //Convert ENFA to NFA
-    NFA toNFA();
     //Print ENFA to JSON
     void print();
     //Calculate E-Closure of state

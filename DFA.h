@@ -35,6 +35,8 @@ public:
     const vector<DFAState *> &getStates() const;
 
     DFA();
+
+    DFA(const DFA& dfa1, const DFA& dfa2, bool intersection);
 };
 
 
