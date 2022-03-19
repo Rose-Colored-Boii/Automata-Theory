@@ -33,6 +33,10 @@ public:
     const map<char, set<NFAState *>> &getTransitions() const;
     bool isAccepting() const;
     bool isStarting() const;
+
+    void setAccepting(bool accepting);
+
+    void setStarting(bool starting);
 };
 
 

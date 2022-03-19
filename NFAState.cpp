@@ -30,3 +30,11 @@ void NFAState::addTransition(char character, NFAState *state) {
         transitions[character].insert(state);
     }
 }
+
+void NFAState::setAccepting(bool accepting) {
+    NFAState::accepting = accepting;
+}
+
+void NFAState::setStarting(bool starting) {
+    NFAState::starting = starting;
+}

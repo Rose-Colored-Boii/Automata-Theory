@@ -36,6 +36,18 @@ public:
     void print();
     //Calculate E-Closure of state
     set<NFAState*> ECLOSE(NFAState* state) const;
+
+    void printStats() const;
+
+    ENFA() = default;
+
+    void setEpsilon(char epsilon);
+
+    const vector<NFAState *> &getStates() const;
+
+    const set<char> &getAlphabet() const;
+
+    char getEpsilon() const;
 };
 
 

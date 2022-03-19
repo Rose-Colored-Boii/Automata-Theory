@@ -280,3 +280,37 @@ set<NFAState *> ENFA::ECLOSE(NFAState * state) const {
     }
     return eclose;
 }
+
+void ENFA::printStats() const {
+    cout << "no_of_states=" << this->states.size() << endl;
+    for (auto character : this->alphabet){
+        int nrOf = 0;
+        for (auto state : this->states){
+            for (const auto& transition : state->getTransitions()){
+                if (transition.first == character){
+                    nrOf++;
+                }
+            }
+        }
+        cout << "no_of_transitions[" << character << "]=" << nrOf << endl;
+    }
+    for (auto state : this->states){
+        cout << "degree[" << state->getName() << "]=" << state->getTransitions().size() << endl;
+    }
+}
+
+void ENFA::setEpsilon(char epsilon) {
+    ENFA::epsilon = epsilon;
+}
+
+const vector<NFAState *> &ENFA::getStates() const {
+    return states;
+}
+
+const set<char> &ENFA::getAlphabet() const {
+    return alphabet;
+}
+
+char ENFA::getEpsilon() const {
+    return epsilon;
+}
