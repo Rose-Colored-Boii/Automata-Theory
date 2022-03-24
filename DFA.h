@@ -5,6 +5,7 @@
 #ifndef DFA_DFA_H
 #define DFA_DFA_H
 
+#include <map>
 #include "iostream"
 #include "set"
 #include "vector"
@@ -37,6 +38,12 @@ public:
     DFA();
 
     DFA(const DFA& dfa1, const DFA& dfa2, bool intersection);
+
+    DFA minimize();
+
+    std::map<pair<DFAState *, DFAState *>, char> generateTable();
+
+    void printTable();
 };
 
 
