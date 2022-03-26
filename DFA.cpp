@@ -221,6 +221,32 @@ DFA::DFA(const DFA& dfa1, const DFA& dfa2, bool intersection) {
     }
 }
 
+bool DFA::operator==(DFA& dfa){
+    map<pair<DFAState*, DFAState*>, char> table = generateTable(dfa);
+    printTable(dfa);
+    DFAState* start1 = nullptr;
+    DFAState* start2 = nullptr;
+    for (auto state : states){
+        if (state->isBeginning()){
+            start1 = state;
+        }
+    }
+    for (auto state : dfa.states){
+        if (state->isBeginning()){
+            start2 = state;
+        }
+    }
+    for (auto entry : table){
+        if ((entry.first.first == start1 and entry.first.second == start2) or (entry.first.first == start2 and entry.first.second == start1)){
+            if (entry.second == 'X'){
+                return false;
+            }
+            break;
+        }
+    }
+    return true;
+}
+
 map<pair<DFAState*, DFAState*>, char> DFA::generateTable(){
     map<pair<DFAState*, DFAState*>, char> Table;
     for (int i = 0; i < this->states.size(); i++){
@@ -232,6 +258,84 @@ map<pair<DFAState*, DFAState*>, char> DFA::generateTable(){
             }
             else{
                 Table[{states[j], states[i]}] = '-';
+            }
+        }
+    }
+    for (auto entry : Table){
+        if ((entry.first.first->isAccepting() and !entry.first.second->isAccepting()) or (!entry.first.first->isAccepting() and entry.first.second->isAccepting())){
+            Table[entry.first] = 'X';
+        }
+    }
+    bool done = false;
+    while (!done) {
+        bool found = false;
+        for (auto entry: Table) {
+            if (entry.second == 'X') {
+                continue;
+            }
+            for (auto character : this->alphabet){
+                pair<DFAState*, DFAState*> toPair;
+                DFAState* toState1 = entry.first.first->getTransitions().find(character)->second;
+                DFAState* toState2 = entry.first.second->getTransitions().find(character)->second;
+                if (toState1 == toState2){
+                    continue;
+                }
+                vector<string> names = {toState1->getName(), toState2->getName()};
+                std::sort(names.begin(), names.end());
+                if (toState1->getName() == names[0]){
+                    toPair = {toState1, toState2};
+                }
+                else{
+                    toPair = {toState2, toState1};
+                }
+                if (Table[toPair] == 'X'){
+                    Table[entry.first] = 'X';
+                    found = true;
+                }
+            }
+        }
+        if (!found){
+            done = true;
+        }
+    }
+    return Table;
+}
+
+map<pair<DFAState*, DFAState*>, char> DFA::generateTable(DFA& dfa){
+    map<pair<DFAState*, DFAState*>, char> Table;
+    for (int i = 0; i < this->states.size(); i++){
+        for (int j = i + 1; j < this->states.size(); j++){
+            vector<string> names = {this->states[i]->getName(), this->states[j]->getName()};
+            std::sort(names.begin(), names.end());
+            if (states[i]->getName() == names[0]){
+                Table[{states[i], states[j]}] = '-';
+            }
+            else{
+                Table[{states[j], states[i]}] = '-';
+            }
+        }
+    }
+    for (int i = 0; i < this->states.size(); i++){
+        for (auto & state : dfa.states){
+            vector<string> names = {this->states[i]->getName(), state->getName()};
+            std::sort(names.begin(), names.end());
+            if (states[i]->getName() == names[0]){
+                Table[{states[i], state}] = '-';
+            }
+            else{
+                Table[{state, states[i]}] = '-';
+            }
+        }
+    }
+    for (int i = 0; i < dfa.states.size(); i++){
+        for (int j = i+1; j < dfa.states.size(); j++){
+            vector<string> names = {dfa.states[i]->getName(), dfa.states[j]->getName()};
+            std::sort(names.begin(), names.end());
+            if (dfa.states[i]->getName() == names[0]){
+                Table[{dfa.states[i], dfa.states[j]}] = '-';
+            }
+            else{
+                Table[{dfa.states[j], dfa.states[i]}] = '-';
             }
         }
     }
@@ -326,16 +430,17 @@ DFA DFA::minimize() {
         string name = "{";
         for (const auto& i : names){
             name += i;
-            name += ',';
+            name += ", ";
         }
-        name[name.size()-1] = '}';
-        auto* dfaState = new DFAState(name, accepting, starting);
+        string newName = name.substr(0, name.size()-1);
+        newName[newName.size()-1] = '}';
+        auto* dfaState = new DFAState(newName, accepting, starting);
         minDFA.addState(dfaState);
     }
     for (auto state : minDFA.states){
         string stateName;
         for (auto character : state->getName()){
-            if (character == '{'){
+            if (character == '{' or character == ' '){
                 continue;
             }
             else if (character == ',' or character == '}'){
@@ -360,7 +465,7 @@ DFA DFA::minimize() {
                     if (tempName == toName){
                         state->addTransition(transition.first, toState);
                     }
-                    else if (character == ',' or character == '{'){
+                    else if (character == ',' or character == '{' or character == ' '){
                         tempName = "";
                     }
                     else if (character == '}'){
@@ -391,6 +496,54 @@ void DFA::printTable() {
     vector<DFAState*> stateVector(stateNameVector.size());
     for (int i = 0; i < stateNameVector.size(); i++){
         for (auto state : states){
+            if (stateNameVector[i] == state->getName()){
+                stateVector[i] = state;
+                break;
+            }
+        }
+    }
+    for (int i = 1; i < stateVector.size(); i++){
+        cout << stateVector[i]->getName() << '\t';
+        for (int j = 0; j < i; j++){
+            DFAState* state1 = stateVector[i];
+            DFAState* state2 = stateVector[j];
+            for (auto entry : Table){
+                if ((entry.first.first == state1 and entry.first.second == state2) or (entry.first.first == state2 and entry.first.second == state1)){
+                    cout << entry.second << '\t';
+                    break;
+                }
+            }
+        }
+        cout << endl;
+    }
+    cout << '\t';
+    for (int i = 0; i < stateVector.size()-1; i++){
+        cout << stateVector[i]->getName() << '\t';
+    }
+    cout << endl;
+}
+
+void DFA::printTable(DFA& dfa) {
+    map<pair<DFAState*, DFAState*>, char> Table = generateTable(dfa);
+    set<DFAState*> tableStates;
+    for (auto entry : Table){
+        tableStates.insert(entry.first.first);
+        tableStates.insert(entry.first.second);
+    }
+    vector<string> stateNameVector;
+    for (auto state : tableStates){
+        stateNameVector.push_back(state->getName());
+    }
+    std::sort(stateNameVector.begin(), stateNameVector.end());
+    vector<DFAState*> stateVector(stateNameVector.size());
+    for (int i = 0; i < stateNameVector.size(); i++){
+        for (auto state : states){
+            if (stateNameVector[i] == state->getName()){
+                stateVector[i] = state;
+                break;
+            }
+        }
+        for (auto state : dfa.states){
             if (stateNameVector[i] == state->getName()){
                 stateVector[i] = state;
                 break;

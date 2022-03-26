@@ -44,6 +44,12 @@ public:
     std::map<pair<DFAState *, DFAState *>, char> generateTable();
 
     void printTable();
+
+    bool operator==(DFA& dfa);
+
+    map<pair<DFAState *, DFAState *>, char> generateTable(DFA &dfa);
+
+    void printTable(DFA &dfa);
 };
 
 
