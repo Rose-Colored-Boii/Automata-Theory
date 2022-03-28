@@ -45,11 +45,9 @@ public:
 
     void printTable();
 
-    bool operator==(DFA& dfa);
+    map<pair<DFAState *, DFAState *>, char> generateTable(DFA& dfa);
 
-    map<pair<DFAState *, DFAState *>, char> generateTable(DFA &dfa);
-
-    void printTable(DFA &dfa);
+    bool operator==(const DFA& rhs);
 };
 
 

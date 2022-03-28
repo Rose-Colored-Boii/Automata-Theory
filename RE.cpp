@@ -4,42 +4,54 @@
 
 #include "RE.h"
 #include "NFAState.h"
+#include "algorithm"
 
 ENFA RE::toENFA() {
+    vector<char> operators;
+    vector<ENFA> operands;
     ENFA enfa;
-    ENFA temp1;
-    ENFA temp2;
-    auto* startState = new NFAState(to_string(newName), false, true);
-    temp1.addState(startState);
-    newName++;
+    ENFA* temp1 = nullptr;
+    ENFA *temp2 = nullptr;
+    vector<char> specialChar = {'(', ')', '+', '*', '.', eps};
+    string newRegex;
+    for (int i = 0; i < regex.size(); i++){
+        newRegex += regex[i];
+        if ((find(specialChar.begin(), specialChar.end(), regex[i]) == specialChar.end() and find(specialChar.begin(), specialChar.end(), regex[i+1]) == specialChar.end())
+         or (find(specialChar.begin(), specialChar.end(), regex[i]) == specialChar.end() and regex[i+1] == '(') or
+          (find(specialChar.begin(), specialChar.end(), regex[i+1]) == specialChar.end() and regex[i] == ')')){
+            newRegex += '.';
+        }
+    }
     set<char> alphabet;
     enfa.setEpsilon(this->eps);
     for (char& i : regex){
-        if (i != '(' and i != ')' and i != '+' and i != '*' and i != '.' and i != this->eps){
+        if (find(specialChar.begin(), specialChar.end(), i) == specialChar.end()){
             alphabet.insert(i);
+            temp1 = new ENFA();
+            auto* state1 = new NFAState(to_string(newName), false, false);
+            newName++;
+            auto* state2 = new NFAState(to_string(newName), false, false);
+            newName++;
+            state1->addTransition(i, state2);
+            temp1->addState(state1);
+            temp1->addState(state2);
+            operands.push_back(*temp1);
+            delete temp1;
+        }
+        else{
+            if (i == '+' or i == '.' or i == '('){
+                operators.push_back(i);
+            }
+            else if (i == '*'){
+                *temp2 = operands[operands.size()-1];
+                operands.pop_back();
+                operands.push_back(Kleene(*temp2));
+            }
+            else {
+
+            }
         }
     }
-    for (char& i : regex){
-        if (i == '('){
-
-        }
-        else if (i == ')'){
-
-        }
-        else if (i == '*'){
-            temp1 = Kleene(temp1);
-        }
-        else if (i == '.'){
-            temp1 = Concatenation(temp1, temp2);
-        }
-        else if (i == '+'){
-            temp1 = Union(temp1, temp2);
-        }
-    }
-    temp1.setEpsilon(eps);
-    temp1.setAlphabet(alphabet);
-    enfa = temp1;
-    return enfa;
 }
 
 ENFA RE::Union(ENFA enfa1, ENFA enfa2){

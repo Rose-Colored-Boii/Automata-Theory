@@ -22,6 +22,12 @@ public:
 
     ENFA toENFA();
 
+    void Concatenation();
+
+    void Union();
+
+    void Kleene();
+
     ENFA Union(ENFA enfa1, ENFA enfa2);
 
     ENFA Concatenation(ENFA enfa1, ENFA enfa2) const;

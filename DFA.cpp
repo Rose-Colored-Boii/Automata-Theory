@@ -379,6 +379,64 @@ map<pair<DFAState*, DFAState*>, char> DFA::generateTable(DFA& dfa){
     return Table;
 }
 
+map<pair<DFAState*, DFAState*>, char> DFA::generateTable(DFA& dfa){
+    map<pair<DFAState*, DFAState*>, char> Table;
+    for (int i = 0; i < this->states.size(); i++){
+        for (int j = i + 1; j < this->states.size(); j++){
+            vector<string> names = {this->states[i]->getName(), this->states[j]->getName()};
+            std::sort(names.begin(), names.end());
+            if (states[i]->getName() == names[0]){
+                Table[{states[i], states[j]}] = '-';
+            }
+            else{
+                Table[{states[j], states[i]}] = '-';
+            }
+        }
+    }
+    for (auto entry : Table){
+        if ((entry.first.first->isAccepting() and !entry.first.second->isAccepting()) or (!entry.first.first->isAccepting() and entry.first.second->isAccepting())){
+            Table[entry.first] = 'X';
+        }
+    }
+    bool done = false;
+    while (!done) {
+        bool found = false;
+        for (auto entry: Table) {
+            if (entry.second == 'X') {
+                continue;
+            }
+            for (auto character : this->alphabet){
+                pair<DFAState*, DFAState*> toPair;
+                DFAState* toState1 = entry.first.first->getTransitions().find(character)->second;
+                DFAState* toState2 = entry.first.second->getTransitions().find(character)->second;
+                if (toState1 == toState2){
+                    continue;
+                }
+                vector<string> names = {toState1->getName(), toState2->getName()};
+                std::sort(names.begin(), names.end());
+                if (toState1->getName() == names[0]){
+                    toPair = {toState1, toState2};
+                }
+                else{
+                    toPair = {toState2, toState1};
+                }
+                if (Table[toPair] == 'X'){
+                    Table[entry.first] = 'X';
+                    found = true;
+                }
+            }
+        }
+        if (!found){
+            done = true;
+        }
+    }
+    return Table;
+}
+
+bool DFA::operator==(const DFA& rhs) {
+    
+}
+
 DFA DFA::minimize() {
     DFA minDFA;
     minDFA.setAlphabet(this->alphabet);
